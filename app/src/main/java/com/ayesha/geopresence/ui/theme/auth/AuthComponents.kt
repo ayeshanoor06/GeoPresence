@@ -1,5 +1,6 @@
 package com.ayesha.geopresence.ui.auth
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,19 +10,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +41,24 @@ import androidx.compose.ui.unit.dp
 fun isValidEmail(email: String): Boolean =
     android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
 
+private val FieldShape = RoundedCornerShape(16.dp)
+
+@Composable
+private fun authFieldColors(): TextFieldColors {
+    val c = MaterialTheme.colorScheme
+    return OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = c.surfaceContainerLowest.copy(alpha = 0.80f),
+        unfocusedContainerColor = c.surfaceContainerLowest.copy(alpha = 0.60f),
+        errorContainerColor = c.surfaceContainerLowest.copy(alpha = 0.80f),
+        focusedBorderColor = c.primary,
+        unfocusedBorderColor = c.primary.copy(alpha = 0.45f),
+        focusedLeadingIconColor = c.primary,
+        unfocusedLeadingIconColor = c.onSurface.copy(alpha = 0.75f),
+        focusedLabelColor = c.primary,
+        unfocusedLabelColor = c.onSurface.copy(alpha = 0.65f)
+    )
+}
+
 @Composable
 fun AuthHeader(subtitle: String) {
     val colors = MaterialTheme.colorScheme
@@ -47,7 +69,9 @@ fun AuthHeader(subtitle: String) {
         Surface(
             shape = CircleShape,
             color = colors.primaryContainer,
-            modifier = Modifier.size(76.dp)
+            border = BorderStroke(6.dp, colors.surfaceContainerLowest.copy(alpha = 0.55f)),
+            shadowElevation = 4.dp,
+            modifier = Modifier.size(84.dp)
         ) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Icon(
@@ -60,14 +84,14 @@ fun AuthHeader(subtitle: String) {
         }
         Text(
             text = "GeoPresence",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = colors.primary
         )
         Text(
             text = subtitle,
             style = MaterialTheme.typography.bodyLarge,
-            color = colors.onSurfaceVariant,
+            color = colors.onSurface.copy(alpha = 0.70f),
             textAlign = TextAlign.Center
         )
     }
@@ -95,7 +119,8 @@ fun AuthTextField(
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
         keyboardActions = KeyboardActions(onDone = { onDone?.invoke() }),
-        shape = MaterialTheme.shapes.medium,
+        shape = FieldShape,
+        colors = authFieldColors(),
         modifier = modifier.fillMaxWidth()
     )
 }
@@ -118,7 +143,9 @@ fun PasswordField(
         label = { Text(label) },
         leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
         trailingIcon = {
-            TextButton(onClick = onToggleVisible) { Text(if (visible) "Hide" else "Show") }
+            TextButton(onClick = onToggleVisible) {
+                Text(if (visible) "Hide" else "Show", fontWeight = FontWeight.SemiBold)
+            }
         },
         isError = errorText != null,
         supportingText = errorText?.let { msg -> { Text(msg) } },
@@ -126,7 +153,8 @@ fun PasswordField(
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = imeAction),
         keyboardActions = KeyboardActions(onDone = { onDone?.invoke() }),
-        shape = MaterialTheme.shapes.medium,
+        shape = FieldShape,
+        colors = authFieldColors(),
         modifier = modifier.fillMaxWidth()
     )
 }
@@ -153,7 +181,7 @@ fun AuthButton(text: String, isLoading: Boolean, onClick: () -> Unit) {
         onClick = { if (!isLoading) onClick() },
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp)
+            .height(56.dp)
     ) {
         if (isLoading) {
             CircularProgressIndicator(
@@ -162,7 +190,7 @@ fun AuthButton(text: String, isLoading: Boolean, onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onPrimary
             )
         } else {
-            Text(text, style = MaterialTheme.typography.labelLarge)
+            Text(text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         }
     }
 }

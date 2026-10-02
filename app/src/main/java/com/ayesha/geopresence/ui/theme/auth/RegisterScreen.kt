@@ -2,6 +2,7 @@ package com.ayesha.geopresence.ui.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,6 +44,7 @@ fun RegisterScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val focusManager = LocalFocusManager.current
+    val colors = MaterialTheme.colorScheme
 
     var name by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
@@ -71,76 +73,86 @@ fun RegisterScreen(
 
     val selectableRoles = listOf(UserRole.STUDENT, UserRole.TEACHER)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        AuthHeader(subtitle = "Create your account to get started")
-        Spacer(Modifier.height(4.dp))
+    AuthBackground {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            AuthHeader(subtitle = "Create your account to get started")
+            Spacer(Modifier.height(4.dp))
 
-        Text(
-            text = "I am a",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.fillMaxWidth()
-        )
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            selectableRoles.forEachIndexed { index, r ->
-                SegmentedButton(
-                    selected = role == r,
-                    onClick = { role = r },
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = selectableRoles.size),
-                    label = { Text(r.label) }
-                )
+            Text(
+                text = "I am a",
+                style = MaterialTheme.typography.labelLarge,
+                color = colors.onSurface.copy(alpha = 0.70f),
+                modifier = Modifier.fillMaxWidth()
+            )
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                selectableRoles.forEachIndexed { index, r ->
+                    SegmentedButton(
+                        selected = role == r,
+                        onClick = { role = r },
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = selectableRoles.size
+                        ),
+                        colors = SegmentedButtonDefaults.colors(
+                            activeContainerColor = colors.primary,
+                            activeContentColor = colors.onPrimary,
+                            inactiveContainerColor = colors.surfaceContainerLowest.copy(alpha = 0.6f)
+                        ),
+                        label = { Text(r.label) }
+                    )
+                }
             }
-        }
 
-        state.errorMessage?.let { ErrorBanner(it) }
+            state.errorMessage?.let { ErrorBanner(it) }
 
-        AuthTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = "Full name",
-            icon = Icons.Filled.Person,
-            errorText = nameError
-        )
-        AuthTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = "Email",
-            icon = Icons.Filled.Email,
-            keyboardType = KeyboardType.Email,
-            errorText = emailError
-        )
-        PasswordField(
-            value = password,
-            onValueChange = { password = it },
-            label = "Password",
-            visible = showPassword,
-            onToggleVisible = { showPassword = !showPassword },
-            errorText = passwordError
-        )
-        PasswordField(
-            value = confirm,
-            onValueChange = { confirm = it },
-            label = "Confirm password",
-            visible = showPassword,
-            onToggleVisible = { showPassword = !showPassword },
-            imeAction = ImeAction.Done,
-            errorText = confirmError,
-            onDone = { submit() }
-        )
+            AuthTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = "Full name",
+                icon = Icons.Filled.Person,
+                errorText = nameError
+            )
+            AuthTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = "Email",
+                icon = Icons.Filled.Email,
+                keyboardType = KeyboardType.Email,
+                errorText = emailError
+            )
+            PasswordField(
+                value = password,
+                onValueChange = { password = it },
+                label = "Password",
+                visible = showPassword,
+                onToggleVisible = { showPassword = !showPassword },
+                errorText = passwordError
+            )
+            PasswordField(
+                value = confirm,
+                onValueChange = { confirm = it },
+                label = "Confirm password",
+                visible = showPassword,
+                onToggleVisible = { showPassword = !showPassword },
+                imeAction = ImeAction.Done,
+                errorText = confirmError,
+                onDone = { submit() }
+            )
 
-        AuthButton(text = "Create account", isLoading = state.isLoading, onClick = { submit() })
+            AuthButton(text = "Create account", isLoading = state.isLoading, onClick = { submit() })
 
-        TextButton(onClick = onBackToLogin) {
-            Text("Already have an account? Sign in")
+            TextButton(onClick = onBackToLogin) {
+                Text("Already have an account? Sign in", fontWeight = FontWeight.Medium)
+            }
         }
     }
 }

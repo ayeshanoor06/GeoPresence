@@ -2,6 +2,7 @@ package com.ayesha.geopresence.ui.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -57,51 +58,57 @@ fun LoginScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Spacer(Modifier.height(16.dp))
-        AuthHeader(subtitle = "Automatic attendance, powered by your location")
-        Spacer(Modifier.height(8.dp))
+    AuthBackground {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Spacer(Modifier.height(16.dp))
+            AuthHeader(subtitle = "Automatic attendance, powered by your location")
+            Spacer(Modifier.height(12.dp))
 
-        Text(
-            text = "Welcome back",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+            Text(
+                text = "Welcome back",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
 
-        state.errorMessage?.let { ErrorBanner(it) }
+            state.errorMessage?.let { ErrorBanner(it) }
 
-        AuthTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = "Email",
-            icon = Icons.Filled.Email,
-            keyboardType = KeyboardType.Email,
-            errorText = emailError
-        )
-        PasswordField(
-            value = password,
-            onValueChange = { password = it },
-            label = "Password",
-            visible = showPassword,
-            onToggleVisible = { showPassword = !showPassword },
-            imeAction = ImeAction.Done,
-            errorText = passwordError,
-            onDone = { submit() }
-        )
+            AuthTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = "Email",
+                icon = Icons.Filled.Email,
+                keyboardType = KeyboardType.Email,
+                errorText = emailError
+            )
+            PasswordField(
+                value = password,
+                onValueChange = { password = it },
+                label = "Password",
+                visible = showPassword,
+                onToggleVisible = { showPassword = !showPassword },
+                imeAction = ImeAction.Done,
+                errorText = passwordError,
+                onDone = { submit() }
+            )
 
-        AuthButton(text = "Sign in", isLoading = state.isLoading, onClick = { submit() })
+            AuthButton(text = "Sign in", isLoading = state.isLoading, onClick = { submit() })
 
-        TextButton(onClick = onNavigateToRegister) {
-            Text("New to GeoPresence? Create an account")
+            TextButton(onClick = onNavigateToRegister) {
+                Text(
+                    "New to GeoPresence? Create an account",
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 }
