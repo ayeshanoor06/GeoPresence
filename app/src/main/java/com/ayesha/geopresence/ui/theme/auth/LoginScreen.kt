@@ -29,12 +29,12 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.ayesha.geopresence.data.model.UserRole
+import com.ayesha.geopresence.data.model.AppUser
 
 @Composable
 fun LoginScreen(
     viewModel: AuthViewModel,
-    onLoggedIn: (UserRole) -> Unit,
+    onLoggedIn: (AppUser) -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()

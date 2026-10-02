@@ -11,12 +11,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ayesha.geopresence.data.model.UserRole
+import com.ayesha.geopresence.data.model.AppUser
 
 @Composable
 fun SplashScreen(
     viewModel: AuthViewModel,
-    onResult: (UserRole?) -> Unit
+    onResult: (AppUser?) -> Unit
 ) {
     LaunchedEffect(Unit) { viewModel.checkSession(onResult) }
 
@@ -35,3 +35,4 @@ fun SplashScreen(
         }
     }
 }
+

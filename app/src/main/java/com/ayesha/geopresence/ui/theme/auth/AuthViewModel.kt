@@ -2,13 +2,15 @@ package com.ayesha.geopresence.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ayesha.geopresence.data.model.UserRole
+import com.ayesha.geopresence.data.model.AppUser
+import com.ayesha.geopresence.data.model.RegistrationForm
 import com.ayesha.geopresence.data.repository.AuthRepository
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,13 +29,13 @@ class AuthViewModel(
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-    fun login(email: String, password: String, onSuccess: (UserRole) -> Unit) {
+    fun login(email: String, password: String, onSuccess: (AppUser) -> Unit) {
         viewModelScope.launch {
             _uiState.update { AuthUiState(isLoading = true) }
             repository.login(email.trim(), password)
-                .onSuccess { role ->
+                .onSuccess { user ->
                     _uiState.update { AuthUiState() }
-                    onSuccess(role)
+                    onSuccess(user)
                 }
                 .onFailure { e ->
                     _uiState.update { AuthUiState(errorMessage = friendlyMessage(e)) }
@@ -41,19 +43,13 @@ class AuthViewModel(
         }
     }
 
-    fun register(
-        name: String,
-        email: String,
-        password: String,
-        role: UserRole,
-        onSuccess: (UserRole) -> Unit
-    ) {
+    fun register(form: RegistrationForm, onSuccess: (AppUser) -> Unit) {
         viewModelScope.launch {
             _uiState.update { AuthUiState(isLoading = true) }
-            repository.register(name.trim(), email.trim(), password, role)
-                .onSuccess { r ->
+            repository.register(form.copy(email = form.email.trim()))
+                .onSuccess { user ->
                     _uiState.update { AuthUiState() }
-                    onSuccess(r)
+                    onSuccess(user)
                 }
                 .onFailure { e ->
                     _uiState.update { AuthUiState(errorMessage = friendlyMessage(e)) }
@@ -61,8 +57,8 @@ class AuthViewModel(
         }
     }
 
-    fun checkSession(onResult: (UserRole?) -> Unit) {
-        viewModelScope.launch { onResult(repository.currentUserRole()) }
+    fun checkSession(onResult: (AppUser?) -> Unit) {
+        viewModelScope.launch { onResult(repository.currentUserProfile()) }
     }
 
     fun signOut() = repository.signOut()
@@ -75,6 +71,10 @@ class AuthViewModel(
         is FirebaseAuthInvalidUserException,
         is FirebaseAuthInvalidCredentialsException -> "Incorrect email or password."
         is FirebaseNetworkException -> "No internet connection. Please check your network."
+        is FirebaseFirestoreException ->
+            if (e.code == FirebaseFirestoreException.Code.PERMISSION_DENIED)
+                "Permission denied by security rules. Please check your details and try again."
+            else e.localizedMessage ?: "Database error. Please try again."
         else -> e.localizedMessage ?: "Something went wrong. Please try again."
     }
 }
