@@ -1,8 +1,17 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
 }
+
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+
 
 android {
     namespace = "com.ayesha.geopresence"
@@ -14,6 +23,7 @@ android {
         applicationId = "com.ayesha.geopresence"
         minSdk = 26
         targetSdk = 36
+        manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY", "")
         versionCode = 1
         versionName = "1.0"
 
@@ -62,5 +72,8 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
     implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.maps.compose)
+
 }

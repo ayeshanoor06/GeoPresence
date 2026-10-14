@@ -1,6 +1,11 @@
 package com.ayesha.geopresence.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -11,8 +16,8 @@ import com.ayesha.geopresence.ui.auth.AuthViewModel
 import com.ayesha.geopresence.ui.auth.LoginScreen
 import com.ayesha.geopresence.ui.auth.PendingApprovalScreen
 import com.ayesha.geopresence.ui.auth.RegisterScreen
-import com.ayesha.geopresence.ui.auth.SplashScreen
 import com.ayesha.geopresence.ui.components.HomePlaceholderScreen
+import com.ayesha.geopresence.ui.map.CampusMapScreen
 
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier) {
@@ -32,25 +37,24 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         }
     }
 
+    // Auto-login: runs once per app launch (not on rotation, not after sign-out).
+    var sessionChecked by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (!sessionChecked) {
+            sessionChecked = true
+            authViewModel.checkSession { user ->
+                if (user != null && navController.currentDestination?.route == Routes.LOGIN) {
+                    goHome(user)
+                }
+            }
+        }
+    }
+
     NavHost(
         navController = navController,
-        startDestination = Routes.SPLASH,
+        startDestination = Routes.LOGIN,
         modifier = modifier
     ) {
-        composable(Routes.SPLASH) {
-            SplashScreen(
-                viewModel = authViewModel,
-                onResult = { user ->
-                    if (user == null) {
-                        navController.navigate(Routes.LOGIN) {
-                            popUpTo(Routes.SPLASH) { inclusive = true }
-                        }
-                    } else {
-                        goHome(user)
-                    }
-                }
-            )
-        }
         composable(Routes.LOGIN) {
             LoginScreen(
                 viewModel = authViewModel,
@@ -73,13 +77,28 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             )
         }
         composable(Routes.STUDENT_HOME) {
-            HomePlaceholderScreen(roleLabel = "Student", onSignOut = { signOut() })
+            HomePlaceholderScreen(
+                roleLabel = "Student",
+                onSignOut = { signOut() },
+                onOpenMap = { navController.navigate(Routes.CAMPUS_MAP) }
+            )
         }
         composable(Routes.TEACHER_HOME) {
-            HomePlaceholderScreen(roleLabel = "Teacher", onSignOut = { signOut() })
+            HomePlaceholderScreen(
+                roleLabel = "Teacher",
+                onSignOut = { signOut() },
+                onOpenMap = { navController.navigate(Routes.CAMPUS_MAP) }
+            )
         }
         composable(Routes.ADMIN_HOME) {
-            HomePlaceholderScreen(roleLabel = "Admin", onSignOut = { signOut() })
+            HomePlaceholderScreen(
+                roleLabel = "Admin",
+                onSignOut = { signOut() },
+                onOpenMap = { navController.navigate(Routes.CAMPUS_MAP) }
+            )
+        }
+        composable(Routes.CAMPUS_MAP) {
+            CampusMapScreen(onBack = { navController.popBackStack() })
         }
     }
 }
