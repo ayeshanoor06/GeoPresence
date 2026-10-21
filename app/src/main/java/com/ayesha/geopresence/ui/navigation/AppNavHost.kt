@@ -18,11 +18,16 @@ import com.ayesha.geopresence.ui.auth.PendingApprovalScreen
 import com.ayesha.geopresence.ui.auth.RegisterScreen
 import com.ayesha.geopresence.ui.components.HomePlaceholderScreen
 import com.ayesha.geopresence.ui.map.CampusMapScreen
+import androidx.compose.runtime.collectAsState
+import com.ayesha.geopresence.ui.student.StudentShell
+
 
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
+
+    val currentUser by authViewModel.currentUser.collectAsState()
 
     fun goHome(user: AppUser) {
         navController.navigate(Routes.homeFor(user)) {
@@ -77,10 +82,10 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             )
         }
         composable(Routes.STUDENT_HOME) {
-            HomePlaceholderScreen(
-                roleLabel = "Student",
-                onSignOut = { signOut() },
-                onOpenMap = { navController.navigate(Routes.CAMPUS_MAP) }
+            StudentShell(
+                user = currentUser,
+                onOpenMap = { navController.navigate(Routes.CAMPUS_MAP) },
+                onSignOut = { signOut() }
             )
         }
         composable(Routes.TEACHER_HOME) {

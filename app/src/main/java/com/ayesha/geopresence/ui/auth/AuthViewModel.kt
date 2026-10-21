@@ -29,11 +29,15 @@ class AuthViewModel(
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    private val _currentUser = MutableStateFlow<AppUser?>(null)
+    val currentUser: StateFlow<AppUser?> = _currentUser.asStateFlow()
+
     fun login(email: String, password: String, onSuccess: (AppUser) -> Unit) {
         viewModelScope.launch {
             _uiState.update { AuthUiState(isLoading = true) }
             repository.login(email.trim(), password)
                 .onSuccess { user ->
+                    _currentUser.value = user
                     _uiState.update { AuthUiState() }
                     onSuccess(user)
                 }
@@ -48,6 +52,7 @@ class AuthViewModel(
             _uiState.update { AuthUiState(isLoading = true) }
             repository.register(form.copy(email = form.email.trim()))
                 .onSuccess { user ->
+                    _currentUser.value = user
                     _uiState.update { AuthUiState() }
                     onSuccess(user)
                 }
@@ -58,10 +63,17 @@ class AuthViewModel(
     }
 
     fun checkSession(onResult: (AppUser?) -> Unit) {
-        viewModelScope.launch { onResult(repository.currentUserProfile()) }
+        viewModelScope.launch {
+            val user = repository.currentUserProfile()
+            _currentUser.value = user
+            onResult(user)
+        }
     }
 
-    fun signOut() = repository.signOut()
+    fun signOut() {
+        _currentUser.value = null
+        repository.signOut()
+    }
 
     fun clearError() = _uiState.update { it.copy(errorMessage = null) }
 

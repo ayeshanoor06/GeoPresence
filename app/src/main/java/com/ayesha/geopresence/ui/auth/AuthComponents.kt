@@ -1,5 +1,6 @@
 package com.ayesha.geopresence.ui.auth
 
+import android.util.Patterns
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,7 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 fun isValidEmail(email: String): Boolean =
-    android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
+    Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
 
 private val FieldShape = RoundedCornerShape(16.dp)
 
