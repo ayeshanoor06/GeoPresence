@@ -39,6 +39,7 @@ import com.ayesha.geopresence.data.model.AppUser
 import com.ayesha.geopresence.ui.components.AppBackground
 import com.ayesha.geopresence.ui.profile.ProfileScreen
 import kotlinx.coroutines.launch
+import com.ayesha.geopresence.ui.permissions.rememberPermissionState
 
 private enum class StudentTab(val label: String, val icon: ImageVector) {
     HOME("Home", Icons.Filled.Home),
@@ -50,12 +51,14 @@ private enum class StudentTab(val label: String, val icon: ImageVector) {
 fun StudentShell(
     user: AppUser?,
     onOpenMap: () -> Unit,
+    onOpenPermissions: () -> Unit,
     onSignOut: () -> Unit
-) {
+){
     val colors = MaterialTheme.colorScheme
     var tab by rememberSaveable { mutableStateOf(StudentTab.HOME) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val permissionState = rememberPermissionState()
 
     BackHandler(enabled = tab != StudentTab.HOME) { tab = StudentTab.HOME }
 
@@ -85,6 +88,8 @@ fun StudentShell(
             when (tab) {
                 StudentTab.HOME -> StudentHomeScreen(
                     user = user,
+                    permissionsComplete = permissionState.status.allGranted,
+                    onSetupPermissions = onOpenPermissions,
                     onOpenHistory = { tab = StudentTab.HISTORY },
                     onOpenMap = onOpenMap,
                     onOpenProfile = { tab = StudentTab.PROFILE },

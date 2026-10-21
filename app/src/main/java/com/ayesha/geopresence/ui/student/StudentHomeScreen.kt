@@ -19,9 +19,10 @@ import com.ayesha.geopresence.data.model.AppUser
 import com.ayesha.geopresence.ui.components.AttendanceHeroCard
 import com.ayesha.geopresence.ui.components.GreetingHeader
 import com.ayesha.geopresence.ui.components.QuickTile
+import com.ayesha.geopresence.ui.permissions.PermissionBanner
 import kotlin.math.roundToInt
 
-// Temporary sample numbers. Replaced with real attendance data in Step 8.
+// Temporary sample numbers. Replaced with real attendance data in a later step.
 private const val SAMPLE_PRESENT = 46
 private const val SAMPLE_ABSENT = 4
 private const val SAMPLE_ALERTS = 2
@@ -29,6 +30,8 @@ private const val SAMPLE_ALERTS = 2
 @Composable
 fun StudentHomeScreen(
     user: AppUser?,
+    permissionsComplete: Boolean,
+    onSetupPermissions: () -> Unit,
     onOpenHistory: () -> Unit,
     onOpenMap: () -> Unit,
     onOpenProfile: () -> Unit,
@@ -53,6 +56,10 @@ fun StudentHomeScreen(
             alertCount = SAMPLE_ALERTS,
             onBellClick = { onComingSoon("Alerts arrive in a later step") }
         )
+
+        if (!permissionsComplete) {
+            PermissionBanner(onSetup = onSetupPermissions)
+        }
 
         AttendanceHeroCard(
             title = "Attendance Percentage",

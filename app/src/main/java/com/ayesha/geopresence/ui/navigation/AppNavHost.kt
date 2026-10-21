@@ -20,6 +20,7 @@ import com.ayesha.geopresence.ui.components.HomePlaceholderScreen
 import com.ayesha.geopresence.ui.map.CampusMapScreen
 import androidx.compose.runtime.collectAsState
 import com.ayesha.geopresence.ui.student.StudentShell
+import com.ayesha.geopresence.ui.permissions.PermissionSetupScreen
 
 
 @Composable
@@ -85,6 +86,7 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             StudentShell(
                 user = currentUser,
                 onOpenMap = { navController.navigate(Routes.CAMPUS_MAP) },
+                onOpenPermissions = { navController.navigate(Routes.PERMISSION_SETUP) },
                 onSignOut = { signOut() }
             )
         }
@@ -104,6 +106,9 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         }
         composable(Routes.CAMPUS_MAP) {
             CampusMapScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Routes.PERMISSION_SETUP) {
+            PermissionSetupScreen(onBack = { navController.popBackStack() })
         }
     }
 }

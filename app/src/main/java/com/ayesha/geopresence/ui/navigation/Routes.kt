@@ -13,6 +13,7 @@ object Routes {
     const val ADMIN_HOME = "admin_home"
     const val CAMPUS_MAP = "campus_map"
 
+    const val PERMISSION_SETUP = "permission_setup"
     fun homeFor(user: AppUser): String = when {
         user.status == UserStatus.PENDING -> PENDING_APPROVAL
         user.role == UserRole.STUDENT -> STUDENT_HOME
