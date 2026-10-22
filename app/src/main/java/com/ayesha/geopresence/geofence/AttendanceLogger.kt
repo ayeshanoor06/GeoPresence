@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Date
+import com.ayesha.geopresence.notifications.NotificationHelper
 
 class AttendanceLogger(context: Context) {
 
@@ -26,6 +27,8 @@ class AttendanceLogger(context: Context) {
     private val db = FirebaseFirestore.getInstance()
     private val configStore = CampusConfigStore(appContext)
     private val local = LocalAttendanceStore(appContext)
+
+    private val notifier = NotificationHelper(appContext)
 
     private enum class WriteResult { SAVED, QUEUED, FAILED }
 
@@ -43,6 +46,7 @@ class AttendanceLogger(context: Context) {
             Log.w(TAG, "ENTER rejected: mock location detected")
             configStore.saveLastEvent("ENTER", now, "Rejected: fake GPS detected")
             writeMockLog(user, now)
+            notifier.fakeGpsRejected()
             return
         }
         if (location == null) {
@@ -103,6 +107,16 @@ class AttendanceLogger(context: Context) {
             }
         }
         configStore.saveLastEvent("ENTER", now, text)
+
+        when (write) {
+            WriteResult.SAVED, WriteResult.QUEUED -> notifier.attendanceMarked(
+                status = result.status,
+                entryMillis = now,
+                queued = write == WriteResult.QUEUED,
+                afterGrace = result.note != null
+            )
+            WriteResult.FAILED -> notifier.saveFailed()
+        }
     }
 
     // ───────────────────────── EXIT ─────────────────────────
@@ -128,6 +142,9 @@ class AttendanceLogger(context: Context) {
             "Time on campus today: ${formatDuration(total)}"
         }
         configStore.saveLastEvent("EXIT", now, text)
+
+        // Added notification handling for exit events
+        if (write == WriteResult.FAILED) notifier.saveFailed() else notifier.exitRecorded(formatDuration(total))
     }
 
     // ───────────────────────── Firestore ─────────────────────────
@@ -190,10 +207,6 @@ class AttendanceLogger(context: Context) {
         awaitWrite(task, "mock gps log")
     }
 
-    /**
-     * Firestore keeps a write on the phone when offline and uploads it later.
-     * So if the server does not answer in time we treat it as QUEUED, not failed.
-     */
     private suspend fun awaitWrite(task: Task<*>, what: String): WriteResult {
         var completed = false
         return try {
