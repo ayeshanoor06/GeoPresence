@@ -40,7 +40,10 @@ import com.ayesha.geopresence.ui.components.AppBackground
 import com.ayesha.geopresence.ui.profile.ProfileScreen
 import kotlinx.coroutines.launch
 import com.ayesha.geopresence.ui.permissions.rememberPermissionState
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.LaunchedEffect
+import com.ayesha.geopresence.geofence.GeofenceViewModel
+import androidx.compose.runtime.collectAsState
 private enum class StudentTab(val label: String, val icon: ImageVector) {
     HOME("Home", Icons.Filled.Home),
     HISTORY("History", Icons.Filled.DateRange),
@@ -59,6 +62,16 @@ fun StudentShell(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val permissionState = rememberPermissionState()
+
+    val geofenceViewModel: GeofenceViewModel = viewModel()
+    val geofenceState by geofenceViewModel.state.collectAsState()
+    val lastEvent by geofenceViewModel.lastEvent.collectAsState()
+    val geofencePermissionsReady = permissionState.status.foregroundLocation &&
+            permissionState.status.backgroundLocation
+
+    LaunchedEffect(geofencePermissionsReady, user?.uid) {
+        if (geofencePermissionsReady) geofenceViewModel.ensureRegistered(user)
+    }
 
     BackHandler(enabled = tab != StudentTab.HOME) { tab = StudentTab.HOME }
 
@@ -90,6 +103,9 @@ fun StudentShell(
                     user = user,
                     permissionsComplete = permissionState.status.allGranted,
                     onSetupPermissions = onOpenPermissions,
+                    geofenceState = geofenceState,
+                    lastEvent = lastEvent,
+                    onRetryGeofence = { geofenceViewModel.ensureRegistered(user) },
                     onOpenHistory = { tab = StudentTab.HISTORY },
                     onOpenMap = onOpenMap,
                     onOpenProfile = { tab = StudentTab.PROFILE },

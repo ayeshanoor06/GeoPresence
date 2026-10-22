@@ -21,12 +21,15 @@ import com.ayesha.geopresence.ui.map.CampusMapScreen
 import androidx.compose.runtime.collectAsState
 import com.ayesha.geopresence.ui.student.StudentShell
 import com.ayesha.geopresence.ui.permissions.PermissionSetupScreen
-
+import androidx.compose.ui.platform.LocalContext
+import com.ayesha.geopresence.geofence.GeofenceManager
 
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
+
+    val appContext = LocalContext.current.applicationContext
 
     val currentUser by authViewModel.currentUser.collectAsState()
 
@@ -37,6 +40,7 @@ fun AppNavHost(modifier: Modifier = Modifier) {
     }
 
     fun signOut() {
+        GeofenceManager(appContext).stop()
         authViewModel.signOut()
         navController.navigate(Routes.LOGIN) {
             popUpTo(navController.graph.id) { inclusive = true }

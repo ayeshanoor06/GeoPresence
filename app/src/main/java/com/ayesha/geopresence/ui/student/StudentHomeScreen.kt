@@ -22,6 +22,10 @@ import com.ayesha.geopresence.ui.components.QuickTile
 import com.ayesha.geopresence.ui.permissions.PermissionBanner
 import kotlin.math.roundToInt
 
+import com.ayesha.geopresence.geofence.GeofenceEvent
+import com.ayesha.geopresence.geofence.GeofenceUiState
+import com.ayesha.geopresence.ui.components.GeofenceStatusCard
+
 // Temporary sample numbers. Replaced with real attendance data in a later step.
 private const val SAMPLE_PRESENT = 46
 private const val SAMPLE_ABSENT = 4
@@ -32,6 +36,9 @@ fun StudentHomeScreen(
     user: AppUser?,
     permissionsComplete: Boolean,
     onSetupPermissions: () -> Unit,
+    geofenceState: GeofenceUiState,
+    lastEvent: GeofenceEvent?,
+    onRetryGeofence: () -> Unit,
     onOpenHistory: () -> Unit,
     onOpenMap: () -> Unit,
     onOpenProfile: () -> Unit,
@@ -59,6 +66,13 @@ fun StudentHomeScreen(
 
         if (!permissionsComplete) {
             PermissionBanner(onSetup = onSetupPermissions)
+        }
+        if (permissionsComplete) {
+            GeofenceStatusCard(
+                state = geofenceState,
+                lastEvent = lastEvent,
+                onRetry = onRetryGeofence
+            )
         }
 
         AttendanceHeroCard(

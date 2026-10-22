@@ -76,4 +76,6 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.maps.compose)
 
+
+    implementation(libs.play.services.location)
 }
