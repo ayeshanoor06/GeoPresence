@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ayesha.geopresence.ui.components.AppBackground
 import com.ayesha.geopresence.util.PermissionUtils
+import com.ayesha.geopresence.notifications.NotificationHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -251,6 +252,11 @@ fun PermissionSetupScreen(onBack: () -> Unit) {
                 }
 
                 if (allDone) {
+
+                    TextButton(
+                        onClick = { NotificationHelper(context).sendTest() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("Send a test notification") }
                     Button(
                         onClick = onBack,
                         modifier = Modifier
