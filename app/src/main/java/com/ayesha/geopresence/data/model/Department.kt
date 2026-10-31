@@ -10,9 +10,11 @@ data class Department(
     val radiusMeters: Double = 150.0,
     val firstClassStart: String = "08:30",
     val graceMinutes: Int = 15,
-    val lowAttendanceThreshold: Int = 75
+    val lowAttendanceThreshold: Int = 75,
+    val semesterStart: String? = null,
+    val holidays: List<String> = emptyList()
 ) {
-    /** False until the admin/you have entered real campus coordinates. */
+    /** False until real campus coordinates have been entered. */
     val hasGeofence: Boolean get() = geofenceLat != 0.0 || geofenceLng != 0.0
 
     companion object {
@@ -26,7 +28,9 @@ data class Department(
                 radiusMeters = doc.getDouble("radiusMeters") ?: 150.0,
                 firstClassStart = doc.getString("firstClassStart") ?: "08:30",
                 graceMinutes = doc.getLong("graceMinutes")?.toInt() ?: 15,
-                lowAttendanceThreshold = doc.getLong("lowAttendanceThreshold")?.toInt() ?: 75
+                lowAttendanceThreshold = doc.getLong("lowAttendanceThreshold")?.toInt() ?: 75,
+                semesterStart = doc.getString("semesterStart"),
+                holidays = (doc.get("holidays") as? List<*>)?.filterIsInstance<String>().orEmpty()
             )
         }
     }

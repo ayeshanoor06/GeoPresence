@@ -72,6 +72,9 @@ fun StudentShell(
     LaunchedEffect(geofencePermissionsReady, user?.uid) {
         if (geofencePermissionsReady) geofenceViewModel.ensureRegistered(user)
     }
+    val attendanceViewModel: StudentAttendanceViewModel = viewModel()
+    val attendanceState by attendanceViewModel.uiState.collectAsState()
+    LaunchedEffect(user?.uid) { user?.let { attendanceViewModel.start(it) } }
 
     BackHandler(enabled = tab != StudentTab.HOME) { tab = StudentTab.HOME }
 
@@ -101,11 +104,13 @@ fun StudentShell(
             when (tab) {
                 StudentTab.HOME -> StudentHomeScreen(
                     user = user,
+                    attendance = attendanceState,
                     permissionsComplete = permissionState.status.allGranted,
                     onSetupPermissions = onOpenPermissions,
                     geofenceState = geofenceState,
                     lastEvent = lastEvent,
                     onRetryGeofence = { geofenceViewModel.ensureRegistered(user) },
+                    onRetryAttendance = { user?.let { attendanceViewModel.retry(it) } },
                     onOpenHistory = { tab = StudentTab.HISTORY },
                     onOpenMap = onOpenMap,
                     onOpenProfile = { tab = StudentTab.PROFILE },
@@ -115,9 +120,9 @@ fun StudentShell(
                     modifier = contentModifier
                 )
 
-                StudentTab.HISTORY -> ComingSoonPane(
-                    title = "Attendance History",
-                    message = "Your daily records with All / Present / Absent filters arrive in Step 8.",
+                StudentTab.HISTORY -> StudentHistoryScreen(
+                    state = attendanceState,
+                    onRetry = { user?.let { attendanceViewModel.retry(it) } },
                     modifier = contentModifier
                 )
 

@@ -16,7 +16,8 @@ data class AppUser(
     val section: String? = null,
     val batch: String? = null,
     val sectionKey: String? = null,
-    val assignedSectionKeys: List<String> = emptyList()
+    val assignedSectionKeys: List<String> = emptyList(),
+    val createdAtMillis: Long? = null
 ) {
     companion object {
         fun fromSnapshot(doc: DocumentSnapshot): AppUser? {
@@ -37,7 +38,8 @@ data class AppUser(
                 batch = doc.getString("batch"),
                 sectionKey = doc.getString("sectionKey"),
                 assignedSectionKeys = (doc.get("assignedSectionKeys") as? List<*>)
-                    ?.filterIsInstance<String>().orEmpty()
+                    ?.filterIsInstance<String>().orEmpty(),
+                createdAtMillis = doc.getTimestamp("createdAt")?.toDate()?.time
             )
         }
     }

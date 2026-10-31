@@ -96,7 +96,9 @@ fun AttendanceHeroCard(
     present: Int,
     absent: Int,
     total: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    footnote: String? = null,
+    warning: Boolean = false
 ) {
     val colors = MaterialTheme.colorScheme
 
@@ -125,7 +127,7 @@ fun AttendanceHeroCard(
                 AttendanceRing(
                     percent = percent,
                     trackColor = colors.onPrimary.copy(alpha = 0.25f),
-                    progressColor = colors.onPrimary,
+                    progressColor = if (warning) colors.errorContainer else colors.onPrimary,
                     textColor = colors.onPrimary,
                     diameter = 112.dp
                 )
@@ -136,6 +138,13 @@ fun AttendanceHeroCard(
                     HorizontalDivider(color = colors.onPrimary.copy(alpha = 0.30f))
                     StatLine("Total", total)
                 }
+            }
+            if (footnote != null) {
+                Text(
+                    text = footnote,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (warning) colors.errorContainer else colors.onPrimary.copy(alpha = 0.85f)
+                )
             }
         }
     }

@@ -46,7 +46,7 @@ fun AttendanceStatCard(
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Surface(
