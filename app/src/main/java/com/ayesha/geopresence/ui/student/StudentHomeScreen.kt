@@ -185,7 +185,7 @@ private fun LoadingCard() {
 private data class Badge(val text: String, val container: Color, val content: Color)
 
 @Composable
-private fun TodayCards(today: AttendanceStats.DayEntry?) {
+internal fun TodayCards(today: AttendanceStats.DayEntry?) {
     val colors = MaterialTheme.colorScheme
 
     val entryBadge = when {

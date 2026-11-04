@@ -8,6 +8,7 @@ import com.ayesha.geopresence.data.model.AttendanceSource
 import com.ayesha.geopresence.data.model.AttendanceStatus
 import com.ayesha.geopresence.geofence.LocalAttendanceStore.CachedUser
 import com.ayesha.geopresence.geofence.LocalAttendanceStore.DayState
+import com.ayesha.geopresence.notifications.NotificationHelper
 import com.ayesha.geopresence.util.FirestorePaths
 import com.ayesha.geopresence.util.Keys
 import com.ayesha.geopresence.util.awaitTask
@@ -18,7 +19,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Date
-import com.ayesha.geopresence.notifications.NotificationHelper
 
 class AttendanceLogger(context: Context) {
 
@@ -27,7 +27,6 @@ class AttendanceLogger(context: Context) {
     private val db = FirebaseFirestore.getInstance()
     private val configStore = CampusConfigStore(appContext)
     private val local = LocalAttendanceStore(appContext)
-
     private val notifier = NotificationHelper(appContext)
 
     private enum class WriteResult { SAVED, QUEUED, FAILED }
@@ -71,6 +70,7 @@ class AttendanceLogger(context: Context) {
             // FR-03-002: boundary flicker / duplicate event
             AttendanceRules.isDuplicate(day.lastEnterMillis, now) -> {
                 local.saveDay(day.copy(currentEnterMillis = now))
+                clearExit(user, day.dateKey)
                 configStore.setInside(true)
                 configStore.saveLastEvent("ENTER", now, "Duplicate entry ignored (within 30 min)")
             }
@@ -78,6 +78,7 @@ class AttendanceLogger(context: Context) {
             // Genuine return later in the day: still ONE record per day (NR-02-002)
             else -> {
                 local.saveDay(day.copy(lastEnterMillis = now, currentEnterMillis = now))
+                clearExit(user, day.dateKey)
                 configStore.setInside(true)
                 configStore.saveLastEvent("ENTER", now, "Back on campus (today’s attendance already recorded)")
             }
@@ -143,8 +144,8 @@ class AttendanceLogger(context: Context) {
         }
         configStore.saveLastEvent("EXIT", now, text)
 
-        // Added notification handling for exit events
-        if (write == WriteResult.FAILED) notifier.saveFailed() else notifier.exitRecorded(formatDuration(total))
+        if (write == WriteResult.FAILED) notifier.saveFailed()
+        else notifier.exitRecorded(formatDuration(total))
     }
 
     // ───────────────────────── Firestore ─────────────────────────
@@ -193,6 +194,13 @@ class AttendanceLogger(context: Context) {
         return awaitWrite(task, "update exit")
     }
 
+    /** The user is back on campus: clear the earlier exit time (fire-and-forget). */
+    private fun clearExit(user: CachedUser, dateKey: String) {
+        db.collection(FirestorePaths.ATTENDANCE)
+            .document(Keys.attendanceDocId(user.uid, dateKey))
+            .update("exitTime", null)
+    }
+
     private suspend fun writeMockLog(user: CachedUser, now: Long) {
         val task = db.collection(FirestorePaths.MOCK_GPS_LOGS).add(
             mapOf(
@@ -207,6 +215,10 @@ class AttendanceLogger(context: Context) {
         awaitWrite(task, "mock gps log")
     }
 
+    /**
+     * Firestore keeps a write on the phone when offline and uploads it later.
+     * So if the server does not answer in time we treat it as QUEUED, not failed.
+     */
     private suspend fun awaitWrite(task: Task<*>, what: String): WriteResult {
         var completed = false
         return try {

@@ -12,6 +12,7 @@ import com.google.android.gms.location.Priority
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import android.os.SystemClock
 
 object LocationTracker {
 
@@ -31,8 +32,12 @@ object LocationTracker {
         }
 
         // Show something quickly while the first live fix arrives
+        // Only trust a cached location if it is fresh (under 2 minutes old)
         client.lastLocation.addOnSuccessListener { location ->
-            if (location != null) trySend(location)
+            if (location != null) {
+                val ageMs = (SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos) / 1_000_000L
+                if (ageMs < 120_000L) trySend(location)
+            }
         }
 
         try {

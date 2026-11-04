@@ -23,6 +23,7 @@ import com.ayesha.geopresence.ui.student.StudentShell
 import com.ayesha.geopresence.ui.permissions.PermissionSetupScreen
 import androidx.compose.ui.platform.LocalContext
 import com.ayesha.geopresence.geofence.GeofenceManager
+import com.ayesha.geopresence.ui.teacher.TeacherShell
 
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier) {
@@ -95,10 +96,11 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             )
         }
         composable(Routes.TEACHER_HOME) {
-            HomePlaceholderScreen(
-                roleLabel = "Teacher",
-                onSignOut = { signOut() },
-                onOpenMap = { navController.navigate(Routes.CAMPUS_MAP) }
+            TeacherShell(
+                user = currentUser,
+                onOpenMap = { navController.navigate(Routes.CAMPUS_MAP) },
+                onOpenPermissions = { navController.navigate(Routes.PERMISSION_SETUP) },
+                onSignOut = { signOut() }
             )
         }
         composable(Routes.ADMIN_HOME) {

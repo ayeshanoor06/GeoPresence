@@ -353,6 +353,14 @@ private fun CampusBottomCard(
                 onOpenSettings = { PermissionUtils.openAppSettings(context) }
             )
 
+            userLocation?.let { loc ->
+                Text(
+                    text = "Location accuracy ±${loc.accuracy.roundToInt()} m",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.onSurfaceVariant
+                )
+            }
+
             HorizontalDivider(color = colors.outlineVariant)
 
             Row(
