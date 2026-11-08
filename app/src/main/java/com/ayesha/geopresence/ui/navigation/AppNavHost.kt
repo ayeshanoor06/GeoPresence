@@ -16,7 +16,6 @@ import com.ayesha.geopresence.ui.auth.AuthViewModel
 import com.ayesha.geopresence.ui.auth.LoginScreen
 import com.ayesha.geopresence.ui.auth.PendingApprovalScreen
 import com.ayesha.geopresence.ui.auth.RegisterScreen
-import com.ayesha.geopresence.ui.components.HomePlaceholderScreen
 import com.ayesha.geopresence.ui.map.CampusMapScreen
 import androidx.compose.runtime.collectAsState
 import com.ayesha.geopresence.ui.student.StudentShell
@@ -24,6 +23,7 @@ import com.ayesha.geopresence.ui.permissions.PermissionSetupScreen
 import androidx.compose.ui.platform.LocalContext
 import com.ayesha.geopresence.geofence.GeofenceManager
 import com.ayesha.geopresence.ui.teacher.TeacherShell
+import com.ayesha.geopresence.ui.admin.AdminShell
 
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier) {
@@ -104,10 +104,9 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             )
         }
         composable(Routes.ADMIN_HOME) {
-            HomePlaceholderScreen(
-                roleLabel = "Admin",
-                onSignOut = { signOut() },
-                onOpenMap = { navController.navigate(Routes.CAMPUS_MAP) }
+            AdminShell(
+                user = currentUser,
+                onSignOut = { signOut() }
             )
         }
         composable(Routes.CAMPUS_MAP) {
