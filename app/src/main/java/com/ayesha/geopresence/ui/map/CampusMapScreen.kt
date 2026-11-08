@@ -505,7 +505,7 @@ private fun zoomForRadius(radiusMeters: Double, latitude: Double): Float {
     return zoom.toFloat().coerceIn(12f, 19f)
 }
 
-private const val DARK_MAP_STYLE = """
+internal const val DARK_MAP_STYLE = """
 [
  {"elementType":"geometry","stylers":[{"color":"#212121"}]},
  {"elementType":"labels.icon","stylers":[{"visibility":"off"}]},
