@@ -12,6 +12,8 @@ object FirestorePaths {
     const val CLASSES = "classes"
     const val ATTENDANCE = "attendance"
     const val MOCK_GPS_LOGS = "mockGpsLogs"
+
+    const val CLASS_ATTENDANCE = "classAttendance"
 }
 
 object Keys {
