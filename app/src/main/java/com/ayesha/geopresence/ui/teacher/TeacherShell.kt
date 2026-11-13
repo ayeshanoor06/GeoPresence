@@ -70,7 +70,9 @@ fun TeacherShell(
     onSignOut: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
+
     var tab by rememberSaveable { mutableStateOf(TeacherTab.HOME) }
+    var registerClassId by rememberSaveable { mutableStateOf<String?>(null) }
     var selectedClassId by rememberSaveable { mutableStateOf<String?>(null) }
     var showMyAttendance by rememberSaveable { mutableStateOf(false) }
 
@@ -101,9 +103,15 @@ fun TeacherShell(
 
     val selectedClass = (dashboardState as? TeacherDashboardUiState.Ready)
         ?.classes?.firstOrNull { it.id == selectedClassId }
+    val registerClass = (dashboardState as? TeacherDashboardUiState.Ready)
+        ?.classes?.firstOrNull { it.id == registerClassId }
 
-    BackHandler(enabled = selectedClassId != null || showMyAttendance || tab != TeacherTab.HOME) {
+    BackHandler(
+        enabled = registerClassId != null || selectedClassId != null ||
+                showMyAttendance || tab != TeacherTab.HOME
+    ) {
         when {
+            registerClassId != null -> registerClassId = null
             selectedClassId != null -> selectedClassId = null
             showMyAttendance -> showMyAttendance = false
             else -> tab = TeacherTab.HOME
@@ -112,9 +120,16 @@ fun TeacherShell(
 
     AppBackground {
         when {
+            registerClass != null && user != null -> RegisterScreen(
+                classInfo = registerClass,
+                teacher = user,
+                onBack = { registerClassId = null }
+            )
+
             selectedClass != null && user != null -> ClassDetailScreen(
                 classInfo = selectedClass,
                 teacher = user,
+                onOpenRegister = { registerClassId = selectedClass.id },
                 onBack = { selectedClassId = null }
             )
 
