@@ -74,6 +74,7 @@ private fun AttendanceStatus.label(): String =
 fun ClassDetailScreen(
     classInfo: ClassInfo,
     teacher: AppUser,
+    onOpenRegister: () -> Unit,
     onBack: () -> Unit
 ) {
     val viewModel: ClassDetailViewModel = viewModel(key = classInfo.id)
@@ -119,6 +120,7 @@ fun ClassDetailScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
+                actions = { TextButton(onClick = onOpenRegister) { Text("Register") } },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         }
