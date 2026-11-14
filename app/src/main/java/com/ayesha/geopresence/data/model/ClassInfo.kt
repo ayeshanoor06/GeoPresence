@@ -15,7 +15,10 @@ data class ClassInfo(
     val sectionKey: String = "",
     val days: List<String> = emptyList(),   // "MON", "TUE", ...
     val startTime: String = "09:00",
-    val endTime: String = "10:00"
+    val endTime: String = "10:00",
+    val roomId: String = "",
+    val roomName: String = "",
+    val checkDelayMinutes: Int = 15
 ) {
     val title: String get() = subjectName.ifBlank { "Class" }
     val sectionLabel: String
@@ -23,6 +26,7 @@ data class ClassInfo(
     val timeLabel: String get() = "$startTime – $endTime"
     val daysLabel: String
         get() = days.joinToString(", ") { d -> d.lowercase().replaceFirstChar { it.uppercase() } }
+    val hasRoom: Boolean get() = roomId.isNotBlank()
 
     fun runsOn(day: DayOfWeek): Boolean =
         days.any { it.equals(day.name.take(3), ignoreCase = true) }
@@ -42,7 +46,10 @@ data class ClassInfo(
                 sectionKey = doc.getString("sectionKey").orEmpty(),
                 days = (doc.get("days") as? List<*>)?.filterIsInstance<String>().orEmpty(),
                 startTime = doc.getString("startTime") ?: "09:00",
-                endTime = doc.getString("endTime") ?: "10:00"
+                endTime = doc.getString("endTime") ?: "10:00",
+                roomId = doc.getString("roomId").orEmpty(),
+                roomName = doc.getString("roomName").orEmpty(),
+                checkDelayMinutes = doc.getLong("checkDelayMinutes")?.toInt() ?: 15
             )
         }
     }
