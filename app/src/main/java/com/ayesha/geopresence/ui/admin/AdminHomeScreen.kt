@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.Place
 import com.ayesha.geopresence.data.model.AppUser
 import com.ayesha.geopresence.ui.auth.ErrorBanner
 import com.ayesha.geopresence.ui.components.AttendanceRing
@@ -53,6 +54,7 @@ fun AdminHomeScreen(
     onOpenMockLog: () -> Unit,
     onOpenGeofence: () -> Unit,
     onOpenClasses: () -> Unit,
+    onOpenRooms: () -> Unit,
     onComingSoon: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -123,6 +125,7 @@ fun AdminHomeScreen(
                     onOpenMockLog = onOpenMockLog,
                     onOpenGeofence = onOpenGeofence,
                     onOpenClasses = onOpenClasses,
+                    onOpenRooms = onOpenRooms,
                     onComingSoon = onComingSoon
                 )
             }
@@ -240,6 +243,7 @@ private fun ManagementCard(
     onOpenMockLog: () -> Unit,
     onOpenGeofence: () -> Unit,
     onOpenClasses: () -> Unit,
+    onOpenRooms: () -> Unit,
     onComingSoon: (String) -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
@@ -262,9 +266,16 @@ private fun ManagementCard(
             )
             HorizontalDivider(color = colors.outlineVariant)
             ManageRow(
+                icon = Icons.Filled.Place,
+                title = "Room Management",
+                subtitle = "Calibrate classrooms for room-wise attendance",
+                onClick = onOpenRooms
+            )
+            HorizontalDivider(color = colors.outlineVariant)
+            ManageRow(
                 icon = Icons.Filled.DateRange,
                 title = "Class Management",
-                subtitle = "Create classes and assign teachers",
+                subtitle = "Create classes, rooms and assign teachers",
                 onClick = onOpenClasses
             )
             HorizontalDivider(color = colors.outlineVariant)
