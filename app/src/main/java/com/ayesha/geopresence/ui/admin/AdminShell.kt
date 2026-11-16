@@ -49,7 +49,7 @@ private enum class AdminTab(val label: String, val icon: ImageVector) {
     PROFILE("Profile", Icons.Filled.Person)
 }
 
-private enum class AdminSubScreen { NONE, USERS, MOCK_LOG, GEOFENCE, CLASSES }
+private enum class AdminSubScreen { NONE, USERS, MOCK_LOG, GEOFENCE, CLASSES, ROOMS }
 
 @Composable
 fun AdminShell(
@@ -90,6 +90,10 @@ fun AdminShell(
                 onBack = { subScreen = AdminSubScreen.NONE }
             )
 
+            AdminSubScreen.ROOMS -> RoomManagementScreen(
+                onBack = { subScreen = AdminSubScreen.NONE }
+            )
+
             AdminSubScreen.NONE -> Scaffold(
                 containerColor = Color.Transparent,
                 snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -121,6 +125,7 @@ fun AdminShell(
                         onOpenMockLog = { subScreen = AdminSubScreen.MOCK_LOG },
                         onOpenGeofence = { subScreen = AdminSubScreen.GEOFENCE },
                         onOpenClasses = { subScreen = AdminSubScreen.CLASSES },
+                        onOpenRooms = { subScreen = AdminSubScreen.ROOMS },
                         onComingSoon = { message ->
                             scope.launch { snackbarHostState.showSnackbar(message) }
                         },
