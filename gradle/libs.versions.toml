@@ -13,6 +13,7 @@ googleServices = "4.5.0"
 navigationCompose = "2.10.2"
 mapsCompose = "8.3.0"
 playServicesLocation = "21.3.0"
+workManager = "2.11.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +42,9 @@ maps-compose = { group = "com.google.maps.android", name = "maps-compose", versi
 
 
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+
+
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
