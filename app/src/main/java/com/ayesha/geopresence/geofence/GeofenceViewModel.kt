@@ -49,7 +49,12 @@ class GeofenceViewModel(application: Application) : AndroidViewModel(application
 
     fun ensureRegistered(user: AppUser?) {
         if (user == null || user.status != UserStatus.ACTIVE || user.role == UserRole.ADMIN) return
-        LocalAttendanceStore(appContext).saveUser(user)
+        LocalAttendanceStore(appContext).saveUser(user
+            if (user.role == UserRole.STUDENT) {
+                viewModelScope.launch {
+                    RoomCheckSync.refresh(appContext, user.role.name, user.sectionKey, user.departmentId)
+                }
+            }
         if (_state.value is GeofenceUiState.Registering) return
 
         viewModelScope.launch {
