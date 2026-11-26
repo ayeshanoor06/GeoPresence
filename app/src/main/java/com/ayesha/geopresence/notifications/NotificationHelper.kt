@@ -49,6 +49,24 @@ class NotificationHelper(context: Context) {
         color = COLOR_PRIMARY
     )
 
+    fun classAttendanceMarked(
+        className: String,
+        roomName: String,
+        timeMillis: Long,
+        queued: Boolean
+    ) {
+        var text = "You are in $roomName at ${formatTime(timeMillis)}, so your $className " +
+                "attendance is marked."
+        if (queued) text += " Saved on your phone; it will sync when you’re online."
+
+        show(
+            id = 2100 + (className.hashCode() and 0xFF),   // one notification per subject
+            title = "Class attendance marked",
+            text = text,
+            color = COLOR_PRIMARY
+        )
+    }
+
     fun fakeGpsRejected() = show(
         id = ID_WARNING,
         title = "Attendance rejected",
