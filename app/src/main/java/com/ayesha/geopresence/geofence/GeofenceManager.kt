@@ -81,6 +81,7 @@ class GeofenceManager(context: Context) {
     /** Stop watching the campus (used on sign-out). */
     fun stop() {
         client.removeGeofences(pendingIntent)
+        RoomCheckScheduler.cancelAll(appContext)
         LocalAttendanceStore(appContext).clearUser()
         CampusConfigStore(appContext).clear()
     }
